@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<style type="text/css">
+		#container {
+			display: flex;
+			width: 800px;
+			margin: 0 auto;
+
+
+		}
+		#filter {
+			width: 200px;
+		}
+		#items {
+			display: flex;
+			flex-flow: wrap;
+			width: 600px;
+		}
+		.item {
+			width: 180px;
+			display: flex;
+			flex-direction: column;
+			padding: 10px
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div id="filter">
+			<span>Max price:</span><input step="50" id="filterinput" onchange="render()" type="number" value="300" />
+			<span>Category: <select onchange="render()" id="category"><option value="all">All</option><option value="null">No category</option><option value="457">Bolig & design</option>
+<option value="461">Børn &; Legetøj</option>
+<option value="476">Dame</option>
+<option value="1503">Dansk Folkehjælp 2020</option>
+<option value="325">Elektronik</option>
+<option value="488">Gastronomi</option>
+<option value="470">Herre</option>
+<option value="1507">Jul 2020</option>
+<option value="403">Oplevelser</option>
+<option value="1354">Påske 2020</option>
+<option value="1502">Sol &amp; Sommer</option>
+<option value="496">Udeliv</option>
+<option value="451">Udsalg</option></select></span>
+		</div>
+		<div id="items"></div>
+	</div>
+</body>
+<script type="text/javascript">
+	const filter = document.getElementById('filter')
+	const filterinput = document.getElementById('filterinput')
+	const categorySelect = document.getElementById('category')
+	const items = document.getElementById('items')
+
+	let data = []
+	async function main() {
+		const response = await fetch('./data.json')
+		data = await response.json()
+		render()
+	}
+
+	function render()  {
+		const maxPrice = parseInt(filterinput.value, 10)
+		const category = parseInt(categorySelect.value, 10)
+
+
+		let html = ''
+		for (const item of data) {
+			let categoryMatch = categorySelect.value === 'all' || (categorySelect.value === 'null' && item.category === null) || (category === item.category)
+
+			if (item.minSellPrice <= maxPrice && categoryMatch) {
+				console.log(item)
+				html += `
+<div class="item">
+	<img src="${item.overviewImage}"/>
+	<span><a target="_blank" href="https://www.gogift.com/da-DK/product/${item.id}/${item.title.replace(/\s/, '-')}">${item.title}</a></span>
+	<span>${item.shortDescription}</span>
+	<span>${item.minSellPrice}</span>
+</div>`
+			}
+		}
+
+		items.innerHTML = html
+	}
+	main()	
+
+</script>
+
+</html>
